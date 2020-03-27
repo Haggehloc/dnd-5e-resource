@@ -3,6 +3,11 @@ const Schema = mongoose.Schema;
 
 const MonsterSchema = new Schema({
 
+    external_id:{
+        type: Schema.Types.String,
+        default: 0
+    },
+
     index:{
         type: Schema.Types.String,
         default: ""
