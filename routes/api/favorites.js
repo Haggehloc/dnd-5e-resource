@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const mongoose = require("mongoose");
 const request = require("request");
+const utils = require("../route_utils_module/lib/object_utils");
 
 //load models
 const Monster = require("../../models/monster.js");
@@ -26,8 +27,8 @@ router.get("/", (req, res) =>
         })
 );
 
-// @route GET api/favorites/
-// @desc Gets all of the names of all of the favorites
+// @route GET api/favorites/{id}
+// @desc Gets the favorite by id
 // @access Public
 router.get("/:id", (req, res) =>
     Monster.findOne({_id: req.params.id})
@@ -36,10 +37,10 @@ router.get("/:id", (req, res) =>
         })
 );
 
-// @route POST api/monsters/{name}
+// @route POST api/favorites/{name}
 // @desc posts a monster to the favorites by name
 // @access Public
-router.post("/monster/:name", (req, res) => {
+router.post("/monsters/:name", (req, res) => {
     request({
         uri: "http://dnd5eapi.co/api/monsters/" + req.params.name,
         method: "GET",
@@ -48,6 +49,16 @@ router.post("/monster/:name", (req, res) => {
         maxRedirects: 10
     }, function(error, response, body) {
         returnedBody = JSON.parse(body);
+
+        Monster.findOne({external_id: returnedBody._id})
+            .then(monster => {
+                if(!utils.isNullOrEmptyObject(monster)){
+                    res.status(404).json({
+                        noMonstersFound: "Duplicate favorites are not allowed."
+                    })
+                }
+            });
+
         const newMonster = new Monster({
             external_id: returnedBody._id,
             index: returnedBody.index,
