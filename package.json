@@ -4,7 +4,10 @@
   "description": "This server will fetch stats and usefull info for dnd 5e",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "nodemon server.js",
+    "client": "npm start --prefix client",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
   },
   "keywords": [],
   "author": "Ryan Klopka",
@@ -12,9 +15,13 @@
   "dependencies": {
     "apicalypse": "^0.1.6",
     "body-parser": "^1.19.0",
+    "concurrently": "^5.1.0",
     "express": "^4.17.1",
     "mongoose": "^5.9.5",
+    "nodemon": "^2.0.2",
     "passport": "^0.4.1",
+    "proxy": "^1.0.1",
+    "react-moment": "^0.9.7",
     "request": "^2.88.2"
   }
 }
