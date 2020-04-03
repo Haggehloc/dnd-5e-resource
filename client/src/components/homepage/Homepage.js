@@ -10,10 +10,7 @@ export class Homepage extends React.Component {
     constructor(props) {
         super(props);
 
-        this.props.getMonster();
-        this.props.addMonsterToState();
         this.props.getFavorites();
-        this.props.saveToFavorites();
     }
 
     onChange = (e) => {
@@ -28,13 +25,12 @@ export class Homepage extends React.Component {
     };
 
     onClickSave = (e) => {
-        console.log(this.props);
-        this.props.saveToFavorites(e.target.value);
+        this.props.saveToFavorites(e.target.value.toLowerCase().replace(/ /g, "-"));
     };
 
     onClickFavorites = (e) => {
         this.props.addMonsterToState(e.target.value);
-        this.props.getMonster(e.target.value.toLowerCase());
+        this.props.getMonster(e.target.value.toLowerCase().replace(/ /g, "-"));
     };
 
     renderMonster = () => {
@@ -96,6 +92,7 @@ export class Homepage extends React.Component {
                 </div>
                 <div className="md-form active-cyan-2 mb-3">
                     <p className="text-center">This is a lookup for monsters in dnd 5e. Enter the monster you would like to get the stats for. If you would like you could also add the monster to your favorites with the provided button.</p>
+                    <p className="text-center">Example monsters: Kobold, Aboleth, Adult Black Dragon</p>
                     <div className='field-entry'>
                         <input type='text'
                                className='form-control' placeholder="Please enter the monster you would like to search for here."
@@ -128,7 +125,7 @@ Homepage.propTypes = {
     addMonsterToState: PropTypes.func.isRequired,
     saveToFavorites: PropTypes.func.isRequired,
     getFavorites: PropTypes.func.isRequired,
-    monster: PropTypes.string,
+    monster: PropTypes.object,
     monsterView: PropTypes.object,
     favorites: PropTypes.object
 };

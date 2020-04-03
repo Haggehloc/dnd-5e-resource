@@ -41,50 +41,60 @@ router.get("/:id", (req, res) =>
 // @desc posts a monster to the favorites by name
 // @access Public
 router.post("/monsters/:name", (req, res) => {
-    console.log(req.params.name);
-    request({
-        uri: "http://dnd5eapi.co/api/monsters/" + req.params.name,
-        method: "GET",
-        timeout: 10000,
-        followRedirect: true,
-        maxRedirects: 10
-    }, function(error, response, body) {
-        returnedBody = JSON.parse(body);
+    console.log("posting to favorites " + req.params.name);
+    if(utils.isNullOrEmptyObject(req.params.name) || req.params.name === undefined){
+        res.status(404).json({
+            noMonstersFound: "request provided did not contain a valid name."
+        });
+        return;
+    }
+    Monster.findOne({index: req.params.name})
+        .then(monster => {
 
-        Monster.findOne({external_id: returnedBody._id})
-            .then(monster => {
-                if(!utils.isNullOrEmptyObject(monster)){
-                    res.status(404).json({
-                        noMonstersFound: "Duplicate favorites are not allowed."
-                    })
-                }
+            if(!utils.isNullOrEmptyObject(monster)){
+                console.log("skipped");
+                res.status(404).json({
+                    noMonstersFound: "Duplicate favorites are not allowed."
+                });
+                return;
+            }
+
+            request({
+                uri: "http://dnd5eapi.co/api/monsters/" + req.params.name,
+                method: "GET",
+                timeout: 10000,
+                followRedirect: true,
+                maxRedirects: 10
+            }, function(error, response, body) {
+
+                returnedBody = JSON.parse(body);
+
+                const newMonster = new Monster({
+                    external_id: returnedBody._id,
+                    index: returnedBody.index,
+                    name: returnedBody.name,
+                    size: returnedBody.size,
+                    type: returnedBody.type,
+                    subtype: returnedBody.subType,
+                    alignment: returnedBody.alignment,
+                    armorClass: returnedBody.armor_class,
+                    hitPoints: returnedBody.hit_points,
+                    hitDice: returnedBody.hit_dice,
+                    proficiencies: returnedBody.proficiencies,
+                    damageVulnerabilities: returnedBody.damage_vulnerabilities,
+                    damageResistances: returnedBody.damage_resistances,
+                    damageImmunities: returnedBody.damage_immunities
+                });
+
+                newMonster
+                    .save()
+                    .catch(err =>
+                        res.status(404).json({
+                            monsterNotFound: err,
+                        }))
             });
-
-        const newMonster = new Monster({
-            external_id: returnedBody._id,
-            index: returnedBody.index,
-            name: returnedBody.name,
-            size: returnedBody.size,
-            type: returnedBody.type,
-            subtype: returnedBody.subType,
-            alignment: returnedBody.alignment,
-            armorClass: returnedBody.armor_class,
-            hitPoints: returnedBody.hit_points,
-            hitDice: returnedBody.hit_dice,
-            proficiencies: returnedBody.proficiencies,
-            damageVulnerabilities: returnedBody.damage_vulnerabilities,
-            damageResistances: returnedBody.damage_resistances,
-            damageImmunities: returnedBody.damage_immunities
         });
 
-        newMonster
-            .save()
-            .then(Monster => res.json(Monster))
-            .catch(err =>
-                res.status(404).json({
-                    monsterNotFound: err,
-                }))
-    });
 });
 
 module.exports = router;
