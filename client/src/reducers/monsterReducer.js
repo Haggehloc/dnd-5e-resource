@@ -1,13 +1,14 @@
 import {
     ADD_MONSTER_TO_STATE,
     GET_MONSTER,
-    GET_FAVORITES
+    GET_FAVORITES, SAVE_MONSTER_TO_FAVORITES
 } from "../actions/types";
 
 const initialState = {
     monster: "",
-    monsterView: "",
-    favorites: ""
+    monsterView: [],
+    favorites: [],
+    favoriteSaved: true
 };
 
 export default function(state = initialState, action){
@@ -25,8 +26,13 @@ export default function(state = initialState, action){
         case GET_FAVORITES:
             return{
                 ...state,
-                favorites:action.payload
-            }
+                favorites:[...state.favorites, action.payload]
+            };
+        case SAVE_MONSTER_TO_FAVORITES:
+            return{
+                ...state,
+                favoriteSaved: true
+            };
         default:
             return state;
     }

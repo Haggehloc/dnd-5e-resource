@@ -41,6 +41,7 @@ router.get("/:id", (req, res) =>
 // @desc posts a monster to the favorites by name
 // @access Public
 router.post("/monsters/:name", (req, res) => {
+    console.log(req.params.name);
     request({
         uri: "http://dnd5eapi.co/api/monsters/" + req.params.name,
         method: "GET",
