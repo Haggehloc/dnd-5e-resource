@@ -118,8 +118,13 @@ const MonsterSchema = new Schema({
     },
 
     actions:{
-        type: Schema.Types.Map,
+        type: Schema.Types.Map
+    },
+
+    comment:{
+      type: Schema.Types.String
     }
+
 
 
 });

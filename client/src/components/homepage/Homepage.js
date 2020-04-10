@@ -26,6 +26,7 @@ export class Homepage extends React.Component {
 
     onClickSave = (e) => {
         this.props.saveToFavorites(e.target.value.toLowerCase().replace(/ /g, "-"));
+        this.props.getFavorites();
     };
 
     onClickFavorites = (e) => {
@@ -91,8 +92,6 @@ export class Homepage extends React.Component {
                     {this.renderFavorites()}
                 </div>
                 <div className="md-form active-cyan-2 mb-3">
-                    <p className="text-center">This is a lookup for monsters in dnd 5e. Enter the monster you would like to get the stats for. If you would like you could also add the monster to your favorites with the provided button.</p>
-                    <p className="text-center">Example monsters: Kobold, Aboleth, Adult Black Dragon</p>
                     <div className='field-entry'>
                         <input type='text'
                                className='form-control' placeholder="Please enter the monster you would like to search for here."

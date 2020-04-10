@@ -28,7 +28,7 @@ router.get("/", (req, res) =>
 );
 
 // @route GET api/favorites/{id}
-// @desc Gets the favorite by id
+// @desc Gets one favorite by id
 // @access Public
 router.get("/:id", (req, res) =>
     Monster.findOne({_id: req.params.id})
@@ -52,7 +52,6 @@ router.post("/monsters/:name", (req, res) => {
         .then(monster => {
 
             if(!utils.isNullOrEmptyObject(monster)){
-                console.log("skipped");
                 res.status(404).json({
                     noMonstersFound: "Duplicate favorites are not allowed."
                 });
@@ -67,7 +66,7 @@ router.post("/monsters/:name", (req, res) => {
                 maxRedirects: 10
             }, function(error, response, body) {
 
-                returnedBody = JSON.parse(body);
+                const returnedBody = JSON.parse(body);
 
                 const newMonster = new Monster({
                     external_id: returnedBody._id,
@@ -90,11 +89,61 @@ router.post("/monsters/:name", (req, res) => {
                     .save()
                     .catch(err =>
                         res.status(404).json({
-                            monsterNotFound: err,
+                            monsterNotFound: err
                         }))
             });
+        })
+        .catch(err => {
+            res.status(404).json({
+                monsterNotFound: err
+            })
         });
+});
+
+// @route POST api/favorites/{name}
+// @desc gets a monster from the favorites by name
+// @access Public
+router.get("/monsters/comments/:name", (req, res) => {
+    Monster.findOne({index: req.params.name})
+        .then(monster => {
+            if(monster.size === 0){
+                return "";
+            }
+            res.json({comment: monster.comment})
+        }).catch(err => {
+            res.status(404).json({
+                monsterNotFount: "There were no comments found for this monster"
+            })
+    })
 
 });
+
+// @route POST api/favorites/monsters/comments/{name}
+// @desc posts a comment to a favorites that is found by name
+// @access Public
+router.post("/monsters/comments/:name", (req, res) => {
+    if(utils.isNullOrEmptyObject(req.body.comment)){
+        res.status(404).json({
+            noMonstersFound: "request provided did not contain a valid comment."
+        });
+    }
+
+    Monster.findOneAndUpdate({index: req.params.name}, {comment: req.body.comment})
+        .then(monster => {
+            if(utils.isNullOrEmptyObject(monster)){
+                res.status(404).json({
+                    noMonstersFound: "No monster found to update."
+                });
+            }
+            res.json({msg: "Monster successfully updated."});
+        })
+        .catch(err => {
+            res.status(404).json({
+                monsterNotFound: err
+            })
+        });
+});
+
+
 
 module.exports = router;
